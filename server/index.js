@@ -27,11 +27,13 @@ app.use('/api/services', servicesRouter);
 app.use('/api/cart', cartRouter);
 app.use('/api/orders', ordersRouter);
 
-// SPA fallback — serve index.html for non-API routes
+// SPA fallback — serve index.html for non-API, non-static routes
 app.get('*', (req, res) => {
-  if (!req.path.startsWith('/api')) {
-    res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
+  // Skip API routes and static file requests (files with extensions)
+  if (req.path.startsWith('/api') || /\.\w+$/.test(req.path)) {
+    return res.status(404).json({ error: 'Not found' });
   }
+  res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
 });
 
 // Start server
